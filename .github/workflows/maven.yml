@@ -34,13 +34,10 @@ jobs:
       run: mvn test
 
     - name: 5. Package (Create JAR file)
-      run: mvn package -DskipTests # skipTests because we ran them in step 4
+      run: mvn package -DskipTests 
 
     - name: 6. Verify (Integrity checks)
       run: mvn verify
 
     - name: 7. Install (Add to local repo)
       run: mvn install
-
-    # Note: 'Deploy' usually requires a remote server/Nexus/Artifactory setup.
-    # 'Site' generates documentation.
