@@ -57,8 +57,9 @@ pipeline {
 
         stage('9. Deploy') {
             steps {
-                bat 'mvn deploy'
+                bat 'mvn deploy -DaltDeploymentRepository=local::default::file:C:/maven-repo'
             }
+        }
         }
     }
 }
