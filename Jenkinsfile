@@ -60,6 +60,5 @@ pipeline {
                 bat 'mvn deploy -DaltDeploymentRepository=local::default::file:C:/maven-repo'
             }
         }
-        }
     }
 }
