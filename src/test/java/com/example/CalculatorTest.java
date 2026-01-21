@@ -167,7 +167,7 @@ public class CalculatorTest {
     @DisplayName("Test modulo operation")
     void testModulo() {
         Calculator calculator = new Calculator();
-        // If your modulo returns -1, update test expectation
+        // FIX THIS LINE: Change -1 to 2
         assertEquals(2, calculator.modulo(5, 3));
     }
     
