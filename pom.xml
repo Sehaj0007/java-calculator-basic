@@ -10,12 +10,14 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>calculator-app</name>
-    <description>Calculator Application</description>
-
     <properties>
+        <!-- Use only one of these, not both -->
+        <maven.compiler.release>17</maven.compiler.release>
+        <!-- OR -->
+        <!--
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.jupiter.version>5.10.2</junit.jupiter.version>
     </properties>
@@ -43,7 +45,7 @@
             <scope>test</scope>
         </dependency>
         
-        <!-- Optional: Mockito for mocking -->
+        <!-- Optional Mockito - you can remove if not needed -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -61,20 +63,15 @@
 
     <build>
         <plugins>
-            <!-- Compiler Plugin -->
+            <!-- Compiler Plugin - SIMPLIFIED VERSION -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
-                    <!-- Fix the warning about system modules -->
-                    <compilerArgs>
-                        <arg>--release</arg>
-                        <arg>${maven.compiler.target}</arg>
-                    </compilerArgs>
+                    <!-- Use release OR source/target, not both -->
+                    <release>17</release>
                 </configuration>
             </plugin>
             
@@ -84,14 +81,16 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <includes>
-                        <include>**/*Test.java</include>
-                        <include>**/*Tests.java</include>
-                    </includes>
+                    <!-- Add JVM args to suppress warnings -->
+                    <argLine>
+                        --enable-native-access=ALL-UNNAMED
+                        --add-opens=java.base/java.lang=ALL-UNNAMED
+                        --add-opens=java.base/sun.misc=ALL-UNNAMED
+                    </argLine>
                 </configuration>
             </plugin>
             
-            <!-- JaCoCo Plugin for code coverage (optional) -->
+            <!-- JaCoCo Plugin (optional - can remove if not needed) -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
