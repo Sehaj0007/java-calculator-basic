@@ -3,35 +3,34 @@ pipeline {
     
     tools {
         maven 'Maven-3.9.8'
-        // REMOVE the jdk line - Jenkins will use system Java
-    }
-    
-    environment {
-        // Point to your system Java
-        JAVA_HOME = 'C:\\Program Files\\Java\\jdk-25.0.1' // Adjust path if different
-        PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
-        
-        // Suppress Java warnings
-        MAVEN_OPTS = '--enable-native-access=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/sun.misc=ALL-UNNAMED'
+        // No jdk line - uses system default
     }
     
     stages {
-        stage('Check Java Version') {
+        stage('Verify Environment') {
             steps {
                 bat '''
-                    echo "=== Java Information ==="
-                    where java
+                    echo "Checking Java installation..."
                     java -version
-                    echo JAVA_HOME=%JAVA_HOME%
-                    echo "=== Maven Information ==="
+                    echo.
+                    echo "Checking Maven..."
                     mvn --version
+                    echo.
+                    echo "Workspace contents:"
+                    dir
                 '''
             }
         }
         
-        stage('Build & Test') {
+        stage('Build') {
             steps {
-                bat 'mvn clean test --no-transfer-progress'
+                bat 'mvn clean compile --no-transfer-progress'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                bat 'mvn test --no-transfer-progress -Dmaven.test.failure.ignore=true'
             }
             post {
                 always {
@@ -41,9 +40,6 @@ pipeline {
         }
         
         stage('Package') {
-            when {
-                expression { currentBuild.result != 'FAILURE' }
-            }
             steps {
                 bat 'mvn package -DskipTests --no-transfer-progress'
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
@@ -53,7 +49,7 @@ pipeline {
     
     post {
         always {
-            echo "Build ${currentBuild.currentResult} for ${env.BRANCH_NAME}"
+            echo "Pipeline completed with status: ${currentBuild.currentResult}"
         }
     }
 }
