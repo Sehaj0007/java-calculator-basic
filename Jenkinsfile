@@ -3,25 +3,39 @@ pipeline {
     
     tools {
         maven 'Maven-3.9.8'
-        // Use OpenJDK-11 which is already configured
-        jdk 'OpenJDK-21'
+        // REMOVE the jdk line - Jenkins will use system Java
+    }
+    
+    environment {
+        // Point to your system Java
+        JAVA_HOME = 'C:\\Program Files\\Java\\jdk-25.0.1' // Adjust path if different
+        PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
+        
+        // Suppress Java warnings
+        MAVEN_OPTS = '--enable-native-access=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/sun.misc=ALL-UNNAMED'
     }
     
     stages {
-        stage('Build & Test') {
+        stage('Check Java Version') {
             steps {
                 bat '''
-                    echo "=== Building and Testing ==="
-                    mvn clean test --no-transfer-progress
+                    echo "=== Java Information ==="
+                    where java
+                    java -version
+                    echo JAVA_HOME=%JAVA_HOME%
+                    echo "=== Maven Information ==="
+                    mvn --version
                 '''
+            }
+        }
+        
+        stage('Build & Test') {
+            steps {
+                bat 'mvn clean test --no-transfer-progress'
             }
             post {
                 always {
-                    // Publish test results
                     junit '**/target/surefire-reports/*.xml'
-                    
-                    // Archive test reports
-                    archiveArtifacts artifacts: 'target/surefire-reports/*.txt, target/surefire-reports/*.xml', allowEmptyArchive: true
                 }
             }
         }
@@ -39,19 +53,7 @@ pipeline {
     
     post {
         always {
-            echo "Build ${currentBuild.currentResult} for branch ${env.BRANCH_NAME}"
-        }
-        
-        success {
-            echo "✅ All stages completed successfully!"
-        }
-        
-        unstable {
-            echo "⚠️ Build unstable - tests failed"
-        }
-        
-        failure {
-            echo "❌ Build failed!"
+            echo "Build ${currentBuild.currentResult} for ${env.BRANCH_NAME}"
         }
     }
 }
