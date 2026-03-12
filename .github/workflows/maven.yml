@@ -1,43 +1,22 @@
-name: Full Maven Lifecycle CI
+name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-    - name: 1. Clean (Remove old builds)
-      run: mvn clean
-
-    - name: 2. Validate (Project is correct)
-      run: mvn validate
-
-    - name: 3. Compile (Source code to bytecode)
-      run: mvn compile
-
-    - name: 4. Test (Run Unit Tests)
-      run: mvn test
-
-    - name: 5. Package (Create JAR file)
-      run: mvn package -DskipTests 
-
-    - name: 6. Verify (Integrity checks)
-      run: mvn verify
-
-    - name: 7. Install (Add to local repo)
-      run: mvn install
+      - name: Install Dependencies
+        run: npm install
